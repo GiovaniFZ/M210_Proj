@@ -10,12 +10,11 @@ class Simplex():
         # Mostrando o quadro
         self.mostrar_quadro()
         
-        # while self.verifica_iteracao(num_var): 
-        # Encontrando a posicao do pivo
-        pos_pivo = self.encontra_pivo(num_rest, num_var)
-        self.dividir_linhas(pos_pivo, num_var, num_rest)
-        # Printando o quadro
-        self.mostrar_quadro()
+        while self.verifica_iteracao(num_var):
+            pos_pivo = self.encontra_pivo(num_rest, num_var)
+            self.dividir_linhas(pos_pivo, num_var, num_rest)
+            self.elimina(pos_pivo, num_var, num_rest)
+            self.mostrar_quadro()
 
     def cria_quadro(self, num_rest, num_var):
         # O tamanho do quadro será (num_rest+1) X (num_var*num_rest)
@@ -56,7 +55,7 @@ class Simplex():
                 return False
                 
     def encontra_pivo(self, num_rest, num_var):
-        # Enconteando a coluna pivo
+        # Encontrando a coluna pivo
         # Obtendo o indice da coluna menor
         aux = 0
         aux4 = 10000
@@ -81,16 +80,30 @@ class Simplex():
         aux = num_rest*num_var
         while valor % aux != 0:
             valor = valor - 1
-        
         for i in range(6):
             q_simp[valor] = q_simp[valor]/pivo
             valor += 1
-            
+    
+    def elimina(self, pos_pivo, num_var, num_rest):
+        pivo = q_simp[pos_pivo]
+        aux = num_rest * num_var
+
+        for i in range(aux):
+            if i != pos_pivo:
+                razao = q_simp[i] / q_simp[pos_pivo]
+                for j in range(6):
+                    q_simp[i + j] -= razao * q_simp[pos_pivo + j]
+
+    def trocar_colunas(self, coluna1, coluna2, num_var, num_rest):
+        for i in range(num_rest + 1):
+            q_simp[coluna1], q_simp[coluna2] = q_simp[coluna2], q_simp[coluna1]
+            coluna1 += num_var * num_rest
+            coluna2 += num_var * num_rest
+        
     def mostrar_quadro(self):
         print("QUADRO:")
         for i in range(24):
             print(round(q_simp[i],2), end=" ")
             if i == 5 or i == 11 or i == 23 or i == 17:
                print('\n')
-        print('\n')   
-        
+        print('\n')
