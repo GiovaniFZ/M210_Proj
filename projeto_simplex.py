@@ -8,13 +8,15 @@ class Simplex():
         num_rest = int(input("Numero de restricoes: "))
         self.cria_quadro(num_rest, num_var)
         # Mostrando o quadro
-        self.mostrar_quadro()
+        self.mostrar_quadro(num_var, num_rest)
+        pos_pivo = self.encontra_pivo(num_rest, num_var)
+        self.elimina(pos_pivo, num_var, num_rest)
         
-        while self.verifica_iteracao(num_var):
-            pos_pivo = self.encontra_pivo(num_rest, num_var)
-            self.dividir_linhas(pos_pivo, num_var, num_rest)
-            self.elimina(pos_pivo, num_var, num_rest)
-            self.mostrar_quadro()
+       # while self.verifica_iteracao(num_var):
+        #    
+         #   self.dividir_linha_pivo(pos_pivo, num_var, num_rest)
+         #   self.elimina(pos_pivo, num_var, num_rest)
+         #   self.mostrar_quadro(num_var, num_rest)
 
     def cria_quadro(self, num_rest, num_var):
         # O tamanho do quadro será (num_rest+1) X (num_var*num_rest)
@@ -74,7 +76,7 @@ class Simplex():
             aux2 += 6
         return pos_pivo
     
-    def dividir_linhas(self, pos_pivo, num_var, num_rest):
+    def dividir_linha_pivo(self, pos_pivo, num_var, num_rest):
         valor = pos_pivo
         pivo = q_simp[pos_pivo]
         aux = num_rest*num_var
@@ -85,22 +87,49 @@ class Simplex():
             valor += 1
     
     def elimina(self, pos_pivo, num_var, num_rest):
-        pivo = q_simp[pos_pivo]
-        aux = num_rest * num_var
-
-        for i in range(aux):
-            if i != pos_pivo:
-                razao = q_simp[i] / q_simp[pos_pivo]
-                for j in range(6):
-                    q_simp[i + j] -= razao * q_simp[pos_pivo + j]
-
-    def trocar_colunas(self, coluna1, coluna2, num_var, num_rest):
-        for i in range(num_rest + 1):
-            q_simp[coluna1], q_simp[coluna2] = q_simp[coluna2], q_simp[coluna1]
-            coluna1 += num_var * num_rest
-            coluna2 += num_var * num_rest
+        aux = num_var*num_rest # Auxiliar para iterar
+        # linha começo e linha fim do pivo
+        linha_com = pos_pivo
+        linha_fim = pos_pivo
+        while linha_com % aux!= 0:
+            linha_com = linha_com - 1
+        while linha_fim % aux != 0:
+            linha_fim = linha_fim + 1
+        linha_fim = linha_fim - 1
+        # coluna começo e coluna fim do pivo
+        coluna_com = pos_pivo
+        coluna_fim = pos_pivo
+        while coluna_com > aux:
+            coluna_com = coluna_com - 6
+        for i in range(num_var*num_var):
+            if coluna_fim + 6 < len(q_simp):
+                coluna_fim = coluna_fim + 6
+        print(coluna_com) # OK
+        print(coluna_fim) # OK
+        print(linha_com)
+        print(linha_fim)
+        coluna_com_aux = coluna_com
+        linha_com_aux = linha_com
+        linha_fim_aux = linha_fim
         
-    def mostrar_quadro(self):
+        # Identificando a coluna e a linha de referencia
+        coluna_ref = []
+        linha_ref = []
+        while coluna_com_aux < 24:
+            coluna_ref.append(q_simp[coluna_com_aux])
+            coluna_com_aux += 6
+        print(coluna_ref)
+        while linha_com_aux <= linha_fim:
+            linha_ref.append(q_simp[linha_com_aux])
+            linha_com_aux = linha_com_aux + 1
+        print(linha_ref)
+        
+    def trocar_colunas(self, coluna1, coluna2, num_var, num_rest, linha_pivo, coluna_pivo):
+        coluna1 = []
+        coluna2 = []
+        coluna3 = []
+        
+    def mostrar_quadro(self, num_var, num_rest):
         print("QUADRO:")
         for i in range(24):
             print(round(q_simp[i],2), end=" ")
