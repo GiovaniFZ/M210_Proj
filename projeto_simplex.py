@@ -1,11 +1,11 @@
 class Simplex():
-    def __init__(self):
+    def __init__(self, num_var, num_rest):
         # Criando um array global que represente cada um dos quadros simplex.
         global q_simp
         q_simp = []
         # Criando o quadro
-        num_var = int(input("Numero de variaveis de decisao: "))
-        num_rest = int(input("Numero de restricoes: "))
+        self.num_var = num_var
+        self.num_rest = num_rest
         self.cria_quadro(num_rest, num_var)
         # Mostrando o quadro
         self.mostrar_quadro(num_var, num_rest)
@@ -79,6 +79,7 @@ class Simplex():
         return pos_pivo
     
     def dividir_linha_pivo(self, pos_pivo, num_var, num_rest):
+        # Dividindo a linha do pivo pelo elemento pivo
         valor = pos_pivo
         pivo = q_simp[pos_pivo]
         aux = num_rest*num_var
@@ -157,14 +158,11 @@ class Simplex():
         aux = col_ref[linha_id]# -7
         aux = aux/q_simp[pos_pivo]
         aux2 = linha_id*tam
-        print("PIVO")
-        print(q_simp[pos_pivo])
         # Percorrendo a linha 1
         for i in range(tam):
             linha[i] = linha[i] - aux*linha_ref[i]
             q_simp[aux2] = linha[i] # Adicionando no quadro simplex
             aux2 += 1
-        print(linha)
         
     def mostrar_quadro(self, num_var, num_rest):
         print("QUADRO:")
