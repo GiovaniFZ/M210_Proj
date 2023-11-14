@@ -21,7 +21,8 @@ class Simplex():
 
     def cria_quadro(self, num_rest, num_var):
         # O tamanho do quadro será (num_rest+1) X (num_var*num_rest)
-        rep = (num_rest + 1)*(num_var*num_rest)+1
+        rep = (num_rest + 1)*(num_var*num_rest)+1 # 24
+        # 4*6 = 24
         for i in range(rep):
             q_simp.append(0.0)
         
@@ -128,36 +129,42 @@ class Simplex():
         # Encontrando as linhas
         linha1 = []
         linha_id = 0
+        aux = 0
         tam = num_rest*num_var
         
-        for i in range(tam):
-            linha1.append(q_simp[i])
-        self.calcular_nova_linha(linha1, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam)
+        while aux < 24:
+            if aux in linha_ref_ids:
+                aux += 6
+                linha_id += 1
+            for i in range(tam):
+                linha1.append(q_simp[aux])
+                aux += 1
+            self.calcular_nova_linha(linha1, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam)
+            linha1.clear() # Apaga a linha
+            linha_id += 1 # Incrementa id da linha (devem ter 4 linhas)
+                # Resultado esperado:
+                #[-5.0, 0.0, 0.0, 4.666666666666667, 0.0, 466.6666666666667]
+                #[3.0, 0.0, 1.0, 0.0, 0.0, 250.0]
+                #[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                #[0.25, 0.0, 0.0, -0.3333333333333333, 1.0, 16.66666666666667]
         # No exemplo, linha1 = [-5.0, -7.0, 0.0, 0.0, 0.0, 0.0]
         # Linha 1 nova = [-5.0, 0.0, 0.0, 4.666666666666667, 0.0, 466.6666666666667]
         
-        #for i in range(24):
-        #    if i % 6 == 0 and i != 0 and i not in linha_ref_ids:
-        #        self.calcular_nova_linha(linha1, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam)
-        #        linha_id += 1
-        #    else:
-        #        linha1.append(q_simp[i])
+        self.dividir_linha_pivo(pos_pivo, num_var, num_rest)
         
     def calcular_nova_linha(self, linha, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam):
         # Variavel auxiliar para multiplicar o elemento na mesma linha por -1.
-        aux = col_ref[linha_id]# 7
-        print(aux)
+        aux = col_ref[linha_id]# -7
         aux = aux/q_simp[pos_pivo]
+        aux2 = linha_id*tam
+        print("PIVO")
+        print(q_simp[pos_pivo])
         # Percorrendo a linha 1
         for i in range(tam):
             linha[i] = linha[i] - aux*linha_ref[i]
-            q_simp[i] = linha[i] # Adicionando no quadro simplex
-        linha.clear() # Apagando a linha
-        
-    def trocar_colunas(self, coluna1, coluna2, num_var, num_rest, linha_pivo, coluna_pivo):
-        coluna1 = []
-        coluna2 = []
-        coluna3 = []
+            q_simp[aux2] = linha[i] # Adicionando no quadro simplex
+            aux2 += 1
+        print(linha)
         
     def mostrar_quadro(self, num_var, num_rest):
         print("QUADRO:")
