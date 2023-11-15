@@ -9,15 +9,16 @@ class Simplex():
         self.cria_quadro(num_rest, num_var)
         # Mostrando o quadro
         self.mostrar_quadro(num_var, num_rest)
+        
         pos_pivo = self.encontra_pivo(num_rest, num_var)
+        #print(q_simp[pos_pivo])
+        self.encontra_lref(pos_pivo, num_var, num_rest)
+        self.mostrar_quadro(num_var, num_rest)
+        pos_pivo = self.encontra_pivo(num_rest, num_var)
+        #print(q_simp[pos_pivo])
         self.encontra_lref(pos_pivo, num_var, num_rest)
         self.mostrar_quadro(num_var, num_rest)
         
-       # while self.verifica_iteracao(num_var):
-        #    
-         #   self.dividir_linha_pivo(pos_pivo, num_var, num_rest)
-         #   self.encontra_lref(pos_pivo, num_var, num_rest)
-         #   self.mostrar_quadro(num_var, num_rest)
 
     def cria_quadro(self, num_rest, num_var):
         # O tamanho do quadro será (num_rest+1) X (num_var*num_rest)
@@ -62,20 +63,21 @@ class Simplex():
         # Encontrando a coluna pivo
         # Obtendo o indice da coluna menor
         aux = 0
-        aux4 = 10000
+        aux4 = float('inf') # Maior valor
         pos_pivo = 0
+        tam = num_rest*num_var
         for i in range(num_var):
             if q_simp[i] < aux:
                 aux = i
         # Dividindo cada elemento
-        aux2 = aux + (num_rest*num_var) 
+        aux2 = aux + tam 
         for i in range(num_rest):
             if q_simp[aux2] != 0: # Divisao por zero nao deve existir
-                aux3 = q_simp[aux2+4]/q_simp[aux2]
-                if aux3 < aux4:
+                aux3 = q_simp[aux2+4]/q_simp[aux2] # 83.3
+                if aux3 < aux4 and aux3 != 0: 
                     aux4 = aux3
                     pos_pivo = aux2
-            aux2 += 6
+            aux2 += tam # Vai pra proxima linha
         return pos_pivo
     
     def dividir_linha_pivo(self, pos_pivo, num_var, num_rest):
@@ -91,22 +93,30 @@ class Simplex():
     
     def encontra_lref(self, pos_pivo, num_var, num_rest):
         aux = num_var*num_rest # Auxiliar para iterar
+        tam = num_rest*num_var
+        tam_q = 4*tam
         # linha começo e linha fim do pivo
+        print("POSICAO PIVO")
+        print(pos_pivo)
         linha_com = pos_pivo
         linha_fim = pos_pivo
-        while linha_com % aux != 0:
-            linha_com = linha_com - 1
-        while linha_fim % aux != 0:
-            linha_fim = linha_fim + 1
+        if pos_pivo % aux != 0:
+            while linha_com % aux != 0:
+                linha_com = linha_com - 1
+            while linha_fim % aux != 0:
+                linha_fim = linha_fim + 1
+        elif linha_com < tam_q:
+                linha_fim += tam
+                    
         linha_fim = linha_fim - 1
         # coluna começo e coluna fim do pivo
         coluna_com = pos_pivo
         coluna_fim = pos_pivo
         while coluna_com > aux:
             coluna_com = coluna_com - 6
-        for i in range(num_var*num_var):
-            if coluna_fim + 6 < len(q_simp):
-                coluna_fim = coluna_fim + 6
+        for i in range(aux):
+            if coluna_fim + aux < len(q_simp):
+                coluna_fim = coluna_fim + aux
         coluna_com_aux = coluna_com
         linha_com_aux = linha_com
         linha_fim_aux = linha_fim
@@ -132,17 +142,26 @@ class Simplex():
         linha_id = 0
         aux = 0
         tam = num_rest*num_var
+        tam_q = 4*tam
+        parar = False
         
-        while aux < 24:
+        while aux < tam_q:
             if aux in linha_ref_ids:
-                aux += 6
+                aux += tam
                 linha_id += 1
             for i in range(tam):
-                linha1.append(q_simp[aux])
-                aux += 1
-            self.calcular_nova_linha(linha1, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam)
-            linha1.clear() # Apaga a linha
-            linha_id += 1 # Incrementa id da linha (devem ter 4 linhas)
+                if aux <= tam_q:
+                    print("AUX")
+                    print(aux)
+                    linha1.append(q_simp[aux])
+                    aux += 1
+                else:
+                    parar = True
+                    break
+            if (parar == False):
+                self.calcular_nova_linha(linha1, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam)
+                linha1.clear() # Apaga a linha
+                linha_id += 1 # Incrementa id da linha (devem ter 4 linhas)
                 # Resultado esperado:
                 #[-5.0, 0.0, 0.0, 4.666666666666667, 0.0, 466.6666666666667]
                 #[3.0, 0.0, 1.0, 0.0, 0.0, 250.0]
@@ -151,13 +170,16 @@ class Simplex():
         # No exemplo, linha1 = [-5.0, -7.0, 0.0, 0.0, 0.0, 0.0]
         # Linha 1 nova = [-5.0, 0.0, 0.0, 4.666666666666667, 0.0, 466.6666666666667]
         
+        # Divide a linha do pivo
         self.dividir_linha_pivo(pos_pivo, num_var, num_rest)
         
     def calcular_nova_linha(self, linha, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam):
         # Variavel auxiliar para multiplicar o elemento na mesma linha por -1.
-        aux = col_ref[linha_id]# -7
-        aux = aux/q_simp[pos_pivo]
+        aux = col_ref[linha_id] #-7
+        aux = aux/q_simp[pos_pivo] # aux = Elemento da coluna_ref/pivo
         aux2 = linha_id*tam
+        print("LINHA")
+        print(linha)
         # Percorrendo a linha 1
         for i in range(tam):
             linha[i] = linha[i] - aux*linha_ref[i]
