@@ -6,22 +6,24 @@ class Simplex():
       # Criando o quadro
       self.num_var = num_var
       self.num_rest = num_rest
-      self.cria_quadro(num_rest, num_var)
-      # Tamanho de cada linha
-      tam = num_rest*num_var
+      # Tamanho de cada linha e tamanho do quadro
+      tam = num_rest+num_var+1
+      tam_q = (num_rest+1)*tam
+      # Criando o quadro
+      self.cria_quadro(num_rest, num_var, tam, tam_q)
       # Mostrando o quadro
-      self.mostrar_quadro(num_var, num_rest)
+      self.mostrar_quadro(tam)
 
       while not self.verifica_iteracao(tam):
-          pos_pivo = self.encontra_pivo(num_rest, num_var)
-          self.encontra_lref(pos_pivo, num_var, num_rest)
-          self.mostrar_quadro(num_var, num_rest)
-      self.mostrar_resultados(num_var, num_rest)
+          pos_pivo = self.encontra_pivo(num_rest, tam)
+          self.encontra_lref(pos_pivo, num_var, num_rest, tam, tam_q)
+          self.mostrar_quadro(tam, tam_q)
+      self.mostrar_resultados(num_var, num_rest, tam)
 
 
-  def cria_quadro(self, num_rest, num_var):
-      # O tamanho do quadro será (num_rest+1) X (num_var*num_rest)
-      rep = (num_rest + 1)*(num_var*num_rest)+1 # 24
+  def cria_quadro(self, num_rest, num_var, tam, tam_q):
+      # O tamanho do quadro será (num_rest+1) X (num_var+num_rest+1)
+      rep = tam_q+1 # 24
       # 4*6 = 24
       for i in range(rep):
           q_simp.append(0.0)
@@ -33,23 +35,23 @@ class Simplex():
           q_simp[i] = var1*(-1)
 
       # Entrando com as restricoes
-      # As linhas serão descritas pelo indice num_var*num_rest
-      aux = num_var*num_rest # 6
+      # As linhas serão descritas pelo indice num_var+num_rest+1
+      aux = tam
       for i in range(num_rest):
           for j in range(num_var):
               rest = float(input("Restricao " + str(i+1) + " - variavel " + str(j+1) + ": "))
               q_simp[aux] = rest
               aux += 1 # vai pra proxima coluna
-          aux += 3
+          aux += num_rest #3
           l_dir = float(input("Lado direito: "))
           q_simp[aux] = l_dir
           aux +=1 # vai pra proxima linha
 
       # Construindo a matriz identidade
-      aux = 8
+      aux = tam+num_var
       for i in range(num_rest):
           q_simp[aux] = 1.0
-          aux += 7
+          aux += (tam+1) #7
 
   def verifica_iteracao(self, tam):
       parar = True
@@ -58,12 +60,11 @@ class Simplex():
               parar = False
       return parar
 
-  def encontra_pivo(self, num_rest, num_var):
+  def encontra_pivo(self, num_rest, tam):
       # Encontrando a coluna pivo
       aux = 0 # Obtem o indice do menor elemento da linha 0
       aux4 = float('inf') # Maior valor
       pos_pivo = 0
-      tam = num_rest*num_var
       for i in range(tam):
           if q_simp[i] < q_simp[aux]:
               aux = i
@@ -82,21 +83,20 @@ class Simplex():
           aux5 += tam
       return pos_pivo
 
-  def dividir_linha_pivo(self, pos_pivo, num_var, num_rest):
+  def dividir_linha_pivo(self, pos_pivo, tam):
       # Dividindo a linha do pivo pelo elemento pivo
       valor = pos_pivo
       pivo = q_simp[pos_pivo]
-      aux = num_rest*num_var
+      aux = tam
       while valor % aux != 0:
           valor = valor - 1
       for i in range(aux):
           q_simp[valor] = q_simp[valor]/pivo
           valor += 1
 
-  def encontra_lref(self, pos_pivo, num_var, num_rest):
-      aux = num_var*num_rest # Auxiliar para iterar
-      tam = num_rest*num_var
-      tam_q = 4*tam
+  def encontra_lref(self, pos_pivo, num_var, num_rest, tam, tam_q):
+      aux = num_var+num_rest+1 # Auxiliar para iterar
+      #tam_q = 4*tam
       # linha começo e linha fim do pivo
       linha_com = pos_pivo
       linha_fim = pos_pivo
@@ -134,15 +134,14 @@ class Simplex():
           linha_ref.append(q_simp[linha_com_aux])
           linha_ref_ids.append(linha_com_aux)
           linha_com_aux = linha_com_aux + 1
-      self.encontrar_linhas(linha_ref, linha_ref_ids, num_rest, num_var, coluna_ref, coluna_ref_ids, pos_pivo)
+      self.encontrar_linhas(linha_ref, linha_ref_ids, coluna_ref, coluna_ref_ids, pos_pivo, tam, tam_q)
 
-  def encontrar_linhas(self, linha_ref, linha_ref_ids, num_rest, num_var, col_ref, col_ref_ids, pos_pivo):
+  def encontrar_linhas(self, linha_ref, linha_ref_ids, col_ref, col_ref_ids, pos_pivo, tam, tam_q):
       # Encontrando as linhas
       linha1 = []
       linha_id = 0
       aux = 0
-      tam = num_rest*num_var
-      tam_q = 4*tam
+      #tam_q = 4*tam
       parar = False
 
       while aux < tam_q:
@@ -169,7 +168,7 @@ class Simplex():
       # Linha 1 nova = [-5.0, 0.0, 0.0, 4.666666666666667, 0.0, 466.6666666666667]
 
       # Divide a linha do pivo
-      self.dividir_linha_pivo(pos_pivo, num_var, num_rest)
+      self.dividir_linha_pivo(pos_pivo, tam)
 
   def calcular_nova_linha(self, linha, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam):
       # Variavel auxiliar para multiplicar o elemento na mesma linha por -1.
@@ -182,26 +181,27 @@ class Simplex():
           q_simp[aux2] = linha[i] # Adicionando no quadro simplex
           aux2 += 1
 
-  def mostrar_quadro(self, num_var, num_rest):
+  def mostrar_quadro(self, tam, tam_q):
       print("QUADRO:")
       aux = 1
-      for i in range(4*num_var*num_rest):
+      for i in range (tam_q):
           print(round(q_simp[i],2), end=" | ")
-          if aux % 6 == 0 and i != 0:
+          if aux % tam == 0 and i != 0:
               print('\n')
           aux +=1
       print('\n')
 
-  def mostrar_resultados(self, num_var, num_rest):
+  def mostrar_resultados(self, tam):
       print("RESULTADOS:")
 
       # Mostrar lucro máximo (negativo do valor na última linha, primeira coluna)
-      lucro_maximo = q_simp[(num_var * num_rest) - 1]
-      print(f"Lucro Máximo: {lucro_maximo}")
+      lucro_maximo = q_simp[tam-1]
+      print(f"Lucro Máximo: {round(lucro_maximo,2)}")
 
       # Mostrar preços sombra (última linha, exceto o último elemento)
-      precos_sombra = q_simp[((num_var * num_rest)-4):(num_var * num_rest)-1]
-      print("Preços Sombra:", precos_sombra)
+      precos_sombra = q_simp[(tam-4):tam-1] 
+      ps_round = [round(num, 2) for num in precos_sombra]
+      print("Preços Sombra:", ps_round)
 
 
 
