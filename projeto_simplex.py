@@ -12,13 +12,13 @@ class Simplex():
       # Criando o quadro
       self.cria_quadro(num_rest, num_var, tam, tam_q)
       # Mostrando o quadro
-      self.mostrar_quadro(tam)
+      self.mostrar_quadro(tam, tam_q)
 
       while not self.verifica_iteracao(tam):
           pos_pivo = self.encontra_pivo(num_rest, tam)
           self.encontra_lref(pos_pivo, num_var, num_rest, tam, tam_q)
           self.mostrar_quadro(tam, tam_q)
-      self.mostrar_resultados(num_var, num_rest, tam)
+      self.mostrar_resultados(tam)
 
 
   def cria_quadro(self, num_rest, num_var, tam, tam_q):
@@ -70,7 +70,7 @@ class Simplex():
               aux = i
       # Dividindo cada elemento para obter o menor deles
       aux2 = aux + tam
-      aux5 = 11
+      aux5 = 2*tam - 1 # lado direito da segunda linha
       # AUX5 = CONTROLA AS COLUNAS DO LADO DIREITO
       # AUX2 = CONTROLA A COLUNA DO PIVO
       for i in range(num_rest):
@@ -113,7 +113,7 @@ class Simplex():
       coluna_com = pos_pivo
       coluna_fim = pos_pivo
       while coluna_com >= aux:
-          coluna_com = coluna_com - 6
+          coluna_com = coluna_com - tam
       for i in range(aux):
           if coluna_fim + aux < len(q_simp):
               coluna_fim = coluna_fim + aux
@@ -125,10 +125,10 @@ class Simplex():
       coluna_ref_ids = []
       linha_ref = []
       linha_ref_ids = []
-      while coluna_com_aux < 24:
+      while coluna_com_aux < tam_q:
           coluna_ref.append(q_simp[coluna_com_aux])
           coluna_ref_ids.append(coluna_com_aux)
-          coluna_com_aux += 6
+          coluna_com_aux += tam
       # No exemplo, col_ref = [-7, 0, 1.5, 0.5]
       while linha_com_aux <= linha_fim:
           linha_ref.append(q_simp[linha_com_aux])
