@@ -18,7 +18,7 @@ class Simplex():
           pos_pivo = self.encontra_pivo(num_rest, tam)
           self.encontra_lref(pos_pivo, num_var, num_rest, tam, tam_q)
           self.mostrar_quadro(tam, tam_q)
-      self.mostrar_resultados(tam)
+      self.mostrar_resultados(tam, num_rest)
 
 
   def cria_quadro(self, num_rest, num_var, tam, tam_q):
@@ -191,7 +191,7 @@ class Simplex():
           aux +=1
       print('\n')
 
-  def mostrar_resultados(self, tam):
+  def mostrar_resultados(self, tam, num_rest):
       print("RESULTADOS:")
 
       # Mostrar lucro máximo (negativo do valor na última linha, primeira coluna)
@@ -199,9 +199,20 @@ class Simplex():
       print(f"Lucro Máximo: {round(lucro_maximo,2)}")
 
       # Mostrar preços sombra (última linha, exceto o último elemento)
-      precos_sombra = q_simp[(tam-4):tam-1] 
+      precos_sombra = q_simp[(tam-num_rest-1):tam-1] 
       ps_round = [round(num, 2) for num in precos_sombra]
       print("Preços Sombra:", ps_round)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
