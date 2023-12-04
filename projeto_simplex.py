@@ -1,8 +1,10 @@
-class Simplex():
+class Simplex:
   def __init__(self, num_var, num_rest):
       # Criando um array global que represente cada um dos quadros simplex.
       global q_simp
+      global labels
       q_simp = []
+      labels = []
       # Criando o quadro
       self.num_var = num_var
       self.num_rest = num_rest
@@ -198,11 +200,15 @@ class Simplex():
       lucro_maximo = q_simp[tam-1]
       print(f"Lucro Máximo: {round(lucro_maximo,2)}")
 
-      # Mostrar preços sombra (última linha, exceto o último elemento)
-      precos_sombra = q_simp[(tam-num_rest-1):tam-1] 
+      # Alguns resultados da primeira linha
+      precos_sombra = q_simp[(tam-num_rest-1):tam-1]
       ps_round = [round(num, 2) for num in precos_sombra]
-      print("Preços Sombra:", ps_round)
 
+      print('\nPreço sombra')  
+
+      for index, valor in enumerate(ps_round):
+          print(f"Restrição {index+1}: {valor}")
+ 
 
 
 
