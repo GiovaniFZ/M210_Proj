@@ -2,10 +2,7 @@ class Simplex:
   def __init__(self, num_var, num_rest):
       # Criando um array global que represente cada um dos quadros simplex.
       global q_simp
-      global labels
       q_simp = []
-      labels = []
-      # Criando o quadro
       self.num_var = num_var
       self.num_rest = num_rest
       # Tamanho de cada linha e tamanho do quadro
@@ -136,9 +133,9 @@ class Simplex:
           linha_ref.append(q_simp[linha_com_aux])
           linha_ref_ids.append(linha_com_aux)
           linha_com_aux = linha_com_aux + 1
-      self.encontrar_linhas(linha_ref, linha_ref_ids, coluna_ref, coluna_ref_ids, pos_pivo, tam, tam_q)
+      self.encontrar_linhas(linha_ref, linha_ref_ids, coluna_ref, pos_pivo, tam, tam_q)
 
-  def encontrar_linhas(self, linha_ref, linha_ref_ids, col_ref, col_ref_ids, pos_pivo, tam, tam_q):
+  def encontrar_linhas(self, linha_ref, linha_ref_ids, col_ref, pos_pivo, tam, tam_q):
       # Encontrando as linhas
       linha1 = []
       linha_id = 0
@@ -158,21 +155,14 @@ class Simplex:
                   parar = True
                   break
           if (parar == False):
-              self.calcular_nova_linha(linha1, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam)
+              self.calcular_nova_linha(linha1, linha_id, linha_ref, col_ref, pos_pivo, tam)
               linha1.clear() # Apaga a linha
               linha_id += 1 # Incrementa id da linha (devem ter 4 linhas)
-              # Resultado esperado:
-              #[-5.0, 0.0, 0.0, 4.666666666666667, 0.0, 466.6666666666667]
-              #[3.0, 0.0, 1.0, 0.0, 0.0, 250.0]
-              #[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-              #[0.25, 0.0, 0.0, -0.3333333333333333, 1.0, 16.66666666666667]
-      # No exemplo, linha1 = [-5.0, -7.0, 0.0, 0.0, 0.0, 0.0]
-      # Linha 1 nova = [-5.0, 0.0, 0.0, 4.666666666666667, 0.0, 466.6666666666667]
 
       # Divide a linha do pivo
       self.dividir_linha_pivo(pos_pivo, tam)
 
-  def calcular_nova_linha(self, linha, linha_id, linha_ref, col_ref, col_ref_ids, pos_pivo, tam):
+  def calcular_nova_linha(self, linha, linha_id, linha_ref, col_ref, pos_pivo, tam):
       # Variavel auxiliar para multiplicar o elemento na mesma linha por -1.
       aux = col_ref[linha_id] #-7
       aux = aux/q_simp[pos_pivo] # aux = Elemento da coluna_ref/pivo
